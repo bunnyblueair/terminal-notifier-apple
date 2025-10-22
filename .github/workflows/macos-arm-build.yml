@@ -20,7 +20,7 @@ jobs:
 
       - name: Build terminal-notifier (arm64)
         env:
-          SYMROOT: ${{ github.workspace }}/build
+          BUILD_DIR: ${{ github.workspace }}/build
         run: |
           set -euo pipefail
           xcodebuild \
@@ -29,13 +29,16 @@ jobs:
             -configuration Release \
             -destination 'platform=macOS,arch=arm64' \
             CODE_SIGNING_ALLOWED=NO \
+            -derivedDataPath "$BUILD_DIR" \
             build
 
       - name: Package artifact
+        env:
+          BUILD_DIR: ${{ github.workspace }}/build
         run: |
           set -euo pipefail
           mkdir -p artifacts
-          app_path="build/Release/terminal-notifier.app"
+          app_path="$BUILD_DIR/Build/Products/Release/terminal-notifier.app"
           if [ ! -d "${app_path}" ]; then
             echo "Failed to locate ${app_path}"
             exit 1
